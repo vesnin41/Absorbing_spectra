@@ -33,19 +33,9 @@ class MyBulkMaterial:
         self.wavelength = wavelength
         self.N_m = N_m
 
-        self.N = self.free_e_density()
-        self.m = self.eff_mass_e()
-        self.omega = self.angular_freq()
-        self.omega_p = self.plasma_freq()
-        self.tau = self.e_relax_time()
-        self.Q = self.Q_()
-        self.n_1 = self.n_()
-        self.k_1 = self.k_()
-
-        self.A_bulk = self.A_bulk_()
-
     #------------Block for Bulk-------------------------------------
-    def free_e_density(self):
+    @property
+    def N_e(self):
         '''
         The free electron density
         |
@@ -54,7 +44,8 @@ class MyBulkMaterial:
         
         return (self.rho * self.Na) / self.M
 
-    def eff_mass_e(self):
+    @property
+    def m_e(self):
 
 
         '''
@@ -63,9 +54,10 @@ class MyBulkMaterial:
         Оптически эффективная масса электрона
         '''
 
-        return self.free_e_density() / self.N_m
+        return self.N_e / self.N_m
 
-    def angular_freq(self):
+    @property
+    def omega(self):
         '''
         [omega]
         The angular frequency of the incident light
@@ -81,8 +73,8 @@ class MyBulkMaterial:
 
         return 2 * np.pi * (self.c / self.wavelength)
 
-
-    def plasma_freq(self):
+    @property
+    def omega_p(self):
         '''
         [omega_p]
         The plasma frequency of the material
@@ -91,10 +83,10 @@ class MyBulkMaterial:
         '''
 
 
-        return ((self.N * self.e**2) / (self.m * self.eps_0))**0.5
+        return ((self.N_e * self.e**2) / (self.m_e * self.eps_0))**0.5
 
-
-    def e_relax_time(self):
+    @property
+    def tau(self):
         '''
         [tau] 
         The electron relaxation time
@@ -105,9 +97,10 @@ class MyBulkMaterial:
         #N = N(self)
         #m = m(self, N)
 
-        return (self.m * self.sigma_0) / (self.N * self.e**2)
+        return (self.m_e * self.sigma_0) / (self.N_e * self.e**2)
 
-    def Q_(self):
+    @property
+    def Q(self):
         '''
         
         '''
@@ -116,7 +109,8 @@ class MyBulkMaterial:
             Q[i,:] = self.omega_p**2 / (self.omega[i]**2 + self.tau**-2)
         return Q
 
-    def n_(self):
+    @property
+    def n_1(self):
         '''
         The index of refraction
         '''
@@ -126,7 +120,8 @@ class MyBulkMaterial:
             n[i,:] = (1/np.sqrt(2)) * (((1 - self.Q[i,:])**2 + (self.Q[i,:] / (self.omega[i] * self.tau))**2)**0.5 - self.Q[i,:] + 1)**0.5
         return n
 
-    def k_(self):
+    @property
+    def k_1(self):
         '''
         The extinction coefficient
         '''
@@ -136,7 +131,8 @@ class MyBulkMaterial:
             k[i,:] = (1/np.sqrt(2)) * (((1 - self.Q[i,:])**2 + (self.Q[i,:] / (self.omega[i] * self.tau))**2)**0.5 + self.Q[i,:] - 1)**0.5 
         return k
 
-    def A_bulk_(self):
+    @property
+    def A_bulk(self):
         '''
         Absorptivity
         '''
@@ -177,26 +173,9 @@ class MyThinMaterial(MyBulkMaterial):
         self.h = h
         self.pathsubstrate = pathsubstrate
 
-        self.k_2 = self.k_2_()
-        self.n_2 = self.n_2_()
-        self.mu = self.mu_()
-        self.beta = self.beta_()
 
-        self.A1p = self.A_1_plus()
-        self.A1m = self.A_1_minus()
-        
-        self.A2p = self.A_2_plus()
-        self.A2m = self.A_2_minus()
-
-        self.A3p = self.A_3_plus()
-        self.A3m = self.A_3_minus()
-
-        self.A4p = self.A_4_plus()
-        self.A4m = self.A_4_minus()
-
-        self.A_thin = self.A_thinfilm()
-
-    def k_2_(self):
+    @property
+    def k_2(self):
         # Import data
         dataSiO2 = pd.read_csv(self.pathsubstrate)
 
@@ -208,7 +187,8 @@ class MyThinMaterial(MyBulkMaterial):
 
         return  k_2p(self.wavelength)
 
-    def n_2_(self):
+    @property
+    def n_2(self):
         # Import data
         dataSiO2 = pd.read_csv(self.pathsubstrate)
 
@@ -220,7 +200,8 @@ class MyThinMaterial(MyBulkMaterial):
 
         return  n_2p(self.wavelength)
 
-    def mu_(self):
+    @property
+    def mu(self):
         '''
         
         '''
@@ -229,8 +210,8 @@ class MyThinMaterial(MyBulkMaterial):
             mu[i,:] = (4*np.pi*self.k_1[i,:]*self.h) / self.wavelength[i]
         return mu
 
-
-    def beta_(self):
+    @property
+    def beta(self):
         '''
         
         '''
@@ -243,7 +224,8 @@ class MyThinMaterial(MyBulkMaterial):
 
     #Coefficient A1:
 
-    def A_1_plus(self):
+    @property
+    def A_1p(self):
         '''
         Coefficient A1+
         |
@@ -256,7 +238,8 @@ class MyThinMaterial(MyBulkMaterial):
             A_1p[i,:] = ((1 + self.n_1[i,:])**2 + self.k_1[i,:]**2) * ((self.n_1[i,:] + self.n_2[i])**2 +  (self.k_1[i,:] + self.k_2[i])**2)
         return  A_1p
 
-    def A_1_minus(self):
+    @property
+    def A_1m(self):
         '''
         Coefficient A1-
         |
@@ -272,7 +255,8 @@ class MyThinMaterial(MyBulkMaterial):
 
     #Coefficient A2:
 
-    def A_2_plus(self):
+    @property
+    def A_2p(self):
         '''
         Coefficient A2+
         |
@@ -286,7 +270,8 @@ class MyThinMaterial(MyBulkMaterial):
                 
         return A_2p
 
-    def A_2_minus(self):
+    @property
+    def A_2m(self):
         '''
         Coefficient A2-
         |
@@ -301,7 +286,8 @@ class MyThinMaterial(MyBulkMaterial):
 
     #Coefficient A3:
 
-    def A_3_plus(self):
+    @property
+    def A_3p(self):
         '''
         Coefficient A3+
         |
@@ -315,7 +301,8 @@ class MyThinMaterial(MyBulkMaterial):
                 
         return A_3p
 
-    def A_3_minus(self):
+    @property
+    def A_3m(self):
         '''
         Coefficient A3-
         |
@@ -330,7 +317,8 @@ class MyThinMaterial(MyBulkMaterial):
 
     # Coefficient A4:
 
-    def A_4_plus(self):
+    @property
+    def A_4p(self):
         '''
         Coefficient A4+
         |
@@ -344,7 +332,8 @@ class MyThinMaterial(MyBulkMaterial):
                      
         return A_4p
 
-    def A_4_minus(self):
+    @property
+    def A_4m(self):
         '''
         Coefficient A4-
         |
@@ -359,16 +348,24 @@ class MyThinMaterial(MyBulkMaterial):
         return A_4o
 
 
+    @property
+    def R_thinfilm(self):
+        '''
+        Absorptivity of the thin film
+        '''
+        R1 = self.A_1m*np.exp(self.mu) + self.A_2p*np.exp(-self.mu) + self.A_3p*np.cos(self.beta) + self.A_4m*np.sin(self.beta)
+        R2 = self.A_1p*np.exp(self.mu) + self.A_2m*np.exp(-self.mu) + self.A_3m*np.cos(self.beta) + self.A_4p*np.sin(self.beta)
+        R = R1 / R2
+        return R
+
+    @property
     def A_thinfilm(self):
         '''
         Absorptivity of the thin film
         '''
-        R1 = self.A1m*np.exp(self.mu) + self.A2p*np.exp(-self.mu) + self.A3p*np.cos(self.beta) + self.A4m*np.sin(self.beta)
-        R2 = self.A1p*np.exp(self.mu) + self.A2m*np.exp(-self.mu) + self.A3m*np.cos(self.beta) + self.A4p*np.sin(self.beta)
-        R = R1 / R2
-        return 1 - R
+        return 1 - self.R_thinfilm
 
-
+    
 
 
 def main():
@@ -380,19 +377,18 @@ def main():
         wavelength =  np.linspace(2e-6, 30e-6, 29),
         N_m = 1.254e59,
     )
-
-    omega = Titan_Bulk.angular_freq()
-    print(omega)
+    print('Hello')
+    print(Titan_Bulk.omega)
     print('***************************************************')
-    omega_p = Titan_Bulk.plasma_freq()
-    print(omega_p)
+    
+    print(Titan_Bulk.omega_p)
     print('***************************************************')
-    print(Titan_Bulk.e_relax_time())
+    print(Titan_Bulk.tau)
     print('***************************************************')
-    print(Titan_Bulk.free_e_density())
+    print(Titan_Bulk.N_e)
     print('***************************************************')
-    print(Titan_Bulk.eff_mass_e())
-    print("Q = {}".format(Titan_Bulk.Q_()))
+    print(Titan_Bulk.m_e)
+    print("Q = {}".format(Titan_Bulk.Q))
     print('***************************************************')
 
     print('Omega_p = {}'.format(6.582e-16 * Titan_Bulk.omega_p))
@@ -406,7 +402,7 @@ def main():
         N_m = 1.254e59,
         h = 10e-9, 
         pathsubstrate = 'Data/SiO2.csv')
-    print(Titan_10mkm.A_thin)
+    print(Titan_10mkm.A_thinfilm)
 
 
 
