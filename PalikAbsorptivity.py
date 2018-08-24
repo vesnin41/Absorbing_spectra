@@ -39,7 +39,7 @@ class MyBulkMaterial:
         data = pd.read_csv(self.pathfile_n_k)
 
         # Interpolation
-        wavelength_p = np.array(data['Wavelength'])
+        wavelength_p = np.array(data['wl'])
         n_1 = np.array(data['n'])
         n_1 = interp1d(wavelength_p, n_1, kind='cubic')
 
@@ -53,7 +53,7 @@ class MyBulkMaterial:
         data = pd.read_csv(self.pathfile_n_k)
 
         # Interpolation
-        wavelength_p = np.array(data['Wavelength'])
+        wavelength_p = np.array(data['wl'])
         k_1 = np.array(data['k'])
         k_1 = interp1d(wavelength_p, k_1, kind='cubic')
 

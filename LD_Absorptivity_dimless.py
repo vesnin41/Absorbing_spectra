@@ -22,16 +22,14 @@ class MyBulkMaterial:
                  sigma_0: "The material's electrical conductivity", 
                  wavelength: 'Wavelength array [m]', 
                  N_m: "Elemental N/m * 10^-59",
-                 pathfile_n: "n [file csv]",
-                 pathfile_k: "k [file csv]",
+                 pathfile_n_k: "n, k [file csv]",
                  ): 
         self.rho = rho
         self.M = M
         self.sigma_0 = sigma_0
         self.N_m = N_m
         self.wavelength = wavelength
-        self.pathfile_n = pathfile_n
-        self.pathfile_k = pathfile_k
+        self.pathfile_n_k = pathfile_n_k
 
         self.N = self.free_e_density()
         self.m = self.eff_mass_e()
@@ -120,10 +118,10 @@ class MyBulkMaterial:
         The index of refraction
         '''
         # Import from a file
-        data = pd.read_csv(self.pathfile_n)
+        data = pd.read_csv(self.pathfile_n_k)
 
         # Interpolation
-        wavelength_p = np.array(data['wl']) * (10**-6)
+        wavelength_p = np.array(data['wl'])
         n_1 = np.array(data['n'])
         n_1 = interp1d(wavelength_p, n_1, kind='cubic')
 
@@ -134,10 +132,10 @@ class MyBulkMaterial:
         
         '''
         # Import from a file
-        data = pd.read_csv(self.pathfile_k)
+        data = pd.read_csv(self.pathfile_n_k)
 
         # Interpolation
-        wavelength_p = np.array(data['wl']) * (10**-6)
+        wavelength_p = np.array(data['wl'])
         k_1 = np.array(data['k'])
         k_1 = interp1d(wavelength_p, k_1, kind='cubic')
 
@@ -168,8 +166,7 @@ class MyThinMaterial(MyBulkMaterial):
                  sigma_0: "The material's electrical conductivity", 
                  wavelength: 'Wavelength array [m]', 
                  N_m: "Elemental N/m * 10^-59",
-                 pathfile_n: "n [file csv]",
-                 pathfile_k: "k [file csv]",
+                 pathfile_n_k: "n, k [file csv]",
                  h: 'Film thickness',
                  pathsubstrate: 'Substrate material',
                  averaging_n2_k2: 'True or False'
@@ -181,8 +178,7 @@ class MyThinMaterial(MyBulkMaterial):
                 sigma_0, 
                 wavelength,  
                 N_m,  
-                pathfile_n,
-                pathfile_k,
+                pathfile_n_k,
                 )
         self.h = h
         self.pathsubstrate = pathsubstrate
@@ -364,8 +360,7 @@ def main():
         sigma_0 = np.array([0.0207e8, 0.0158e8, 0.01227e8, 0.01007e8, 0.00861e8, 0.00762e8, 0.00699e8, 0.00657e8]),
         wavelength =  np.linspace(2e-6, 30e-6, 29),
         N_m = 1.254e59,
-        pathfile_n = 'Data/Ti_Rakic-LD_n.csv',
-        pathfile_k = 'Data/Ti_Rakic-LD_k.csv',
+        pathfile_n_k = 'Data/Ti_Rakic_LD.csv',
         h = 10e-9, 
         pathsubstrate = 'Data/SiO2.csv',
         averaging_n2_k2 = False,

@@ -17,13 +17,11 @@ class MyBulkMaterial:
 
     def __init__(self, 
                  wavelength: 'Wavelength array [m]', 
-                 pathfile_n: "n from Rakic [file csv]",
-                 pathfile_k: "k from Rakic [file csv]",
+                 pathfile_n_k: "n,k from Rakic [file csv]",
                  ): 
         
         self.wavelength = wavelength
-        self.pathfile_n = pathfile_n
-        self.pathfile_k = pathfile_k
+        self.pathfile_n_k = pathfile_n_k
 
 
         self.n_1 = self.n_1_LD()
@@ -38,10 +36,10 @@ class MyBulkMaterial:
         The index of refraction
         '''
         # Import from a file
-        data = pd.read_csv(self.pathfile_n)
+        data = pd.read_csv(self.pathfile_n_k)
 
         # Interpolation
-        wavelength_p = np.array(data['wl']) * (10**-6)
+        wavelength_p = np.array(data['wl'])
         n_1 = np.array(data['n'])
         n_1 = interp1d(wavelength_p, n_1, kind='cubic')
 
@@ -52,10 +50,10 @@ class MyBulkMaterial:
         
         '''
         # Import from a file
-        data = pd.read_csv(self.pathfile_k)
+        data = pd.read_csv(self.pathfile_n_k)
 
         # Interpolation
-        wavelength_p = np.array(data['wl']) * (10**-6)
+        wavelength_p = np.array(data['wl'])
         k_1 = np.array(data['k'])
         k_1 = interp1d(wavelength_p, k_1, kind='cubic')
 
@@ -81,16 +79,14 @@ class MyThinMaterial(MyBulkMaterial):
 
     def __init__(self, 
                  wavelength: 'Wavelength array [m]', 
-                 pathfile_n: "n from Rakic [file csv]",
-                 pathfile_k: "k from Rakic [file csv]",
+                 pathfile_n_k: "n, k from Rakic [file csv]",
                  h: 'Film thickness',
                  pathsubstrate: 'Substrate material',
                  ):
         
         super().__init__( 
                  wavelength,
-                 pathfile_n,
-                 pathfile_k,
+                 pathfile_n_k,
                  )
 
         self.h = h
@@ -252,9 +248,8 @@ class MyThinMaterial(MyBulkMaterial):
 def main():
     Titan_Bulk_LD = MyBulkMaterial(
         wavelength =  np.linspace(2e-6, 30e-6, 29),
-        pathfile_n = 'Data/Ti_Rakic-LD_n.csv',
-        pathfile_k = 'Data/Ti_Rakic-LD_k.csv',
+        pathfile_n_k = 'Data/Ti_Rakic_LD.csv',
 )
-    print(Titan_Bulk_LD.n_1)
+    print(Titan_Bulk_LD.k_1)
 if __name__ == '__main__':
     main()
