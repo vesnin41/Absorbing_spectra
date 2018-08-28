@@ -233,6 +233,9 @@ class LorentzDrudeModel(DrudeModel):
 
         self.n_1 = self._get_n_1()
         self.k_1 = self._get_k_1()
+
+        self.R = self._get_R()
+        self.A = self._get_A()
         
     def _get_real_dielectric_lorentz(self):
         '''
@@ -277,6 +280,24 @@ class LorentzDrudeModel(DrudeModel):
         '''
 
         return (0.5 * (-1*self.eps_1 + (self.eps_1**2 + self.eps_2**2)**0.5))**0.5
+
+    def _get_R(self):
+        '''
+        Reflectivity
+        |
+        Коэффициент отражения
+        '''
+
+        return ((self.n_1 - 1)**2 + self.k_1**2) / ((self.n_1 + 1)**2 + self.k_1**2)
+
+    def _get_A(self):
+        '''
+        Absorptivity
+        |
+        Коэффициент пропускания
+        '''
+
+        return 1 - self.R
 
     
 
