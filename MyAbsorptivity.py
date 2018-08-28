@@ -353,7 +353,7 @@ class MyThinMaterial(MyBulkMaterial):
 
     def R_thinfilm_(self):
         '''
-        Absorptivity of the thin film
+        Reflectivity of the thin film
         '''
         R1 = self.A_1m*np.exp(self.mu) + self.A_2p*np.exp(-self.mu) + self.A_3p*np.cos(self.beta) + self.A_4m*np.sin(self.beta)
         R2 = self.A_1p*np.exp(self.mu) + self.A_2m*np.exp(-self.mu) + self.A_3m*np.cos(self.beta) + self.A_4p*np.sin(self.beta)
@@ -378,21 +378,8 @@ def main():
         wavelength =  np.linspace(2e-6, 30e-6, 29),
         N_m = 1.254e59,
     )
-    print('Hello')
-    print(Titan_Bulk.omega)
-    print('***************************************************')
-    
-    print(Titan_Bulk.omega_p)
-    print('***************************************************')
-    print(Titan_Bulk.tau)
-    print('***************************************************')
-    print(Titan_Bulk.N)
-    print('***************************************************')
-    print(Titan_Bulk.m)
-    print("Q = {}".format(Titan_Bulk.Q))
-    print('***************************************************')
-
-    print('Omega_p = {}'.format(6.582e-16 * Titan_Bulk.omega_p))
+    print(Titan_Bulk.n_1[:,0])
+    print(Titan_Bulk.k_1[:,0])
     
     Titan_10mkm = MyThinMaterial(
         T = np.array([300, 400, 500, 600, 700, 800, 900, 1000]),
@@ -403,7 +390,7 @@ def main():
         N_m = 1.254e59,
         h = 10e-9, 
         pathsubstrate = 'Data/SiO2.csv')
-    print(Titan_10mkm.A_thin)
+
 
 
 
